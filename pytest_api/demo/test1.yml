@@ -1,0 +1,28 @@
+name: demo1
+
+steps:
+-
+  api:
+    name: post
+    request:
+      method: POST
+      url: /post
+      json:
+        username: test
+        password: "123456"
+    return:
+        url:  body.url
+    response:
+      - eq: [status_code, 200]
+      - eq: [headers.Server, gunicorn/19.9.0]
+      - eq: [$..username, test]
+      - eq: [response.json.username, test]
+
+-
+  api:
+    name: get
+    request:
+      method: GET
+      url: /get
+    response:
+      - eq: [status_code, 200]
