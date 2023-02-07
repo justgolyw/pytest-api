@@ -1,5 +1,3 @@
-========== pytest-api ==========
-
 REST API的通用测试框架，依赖pytest框架，整体是只是pytest框架的插件
 
 ----
