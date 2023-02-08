@@ -2,6 +2,7 @@ import re
 import jmespath
 import jsonpath
 from requests import Response
+from .common import get_cookies
 
 
 def extract_by_jsonpath(extract_value: dict, extract_expression: str):
@@ -71,7 +72,7 @@ def extract_by_object(response: Response, extract_expression: str):
         return extract_expression
     res = {
         "headers": response.headers,
-        "cookies": response.cookies,
+        "cookies": get_cookies(response)
     }
     if extract_expression in ["status_code", "url"]:
         return getattr(response, extract_expression)

@@ -1,6 +1,10 @@
 import time
 import types
 from inspect import Parameter
+from pathlib import Path
+
+import yaml
+
 from . import my_builtins, validate
 from .create_function import create_function_from_parameters
 from .render import rend_template_any
@@ -85,6 +89,7 @@ class ApiRunner:
         # 返回值处理
         if "return" in step:
             extract_result = self.extract_response(r, step["return"])
+            res_param.update(extract_result)
             print("extract_result=", extract_result)
         return res_param
 
@@ -162,14 +167,28 @@ class Runner(ApiRunner):
                         continue
                     for item, value in step.items():
                         if item == "name":
-                            continue
+                            pass
                         elif item == "sleep":
                             time.sleep(value)
+                        elif item == "step":
+                            request_session = args.get('request_session')
+                            # 内置request 获取root_dir
+                            root_dir = pytestconfig.rootdir
+                            print("root_dir=", root_dir)
+                            api_path = Path(root_dir).joinpath(value)
+                            print("api_path=", api_path)
+                            raw_api = yaml.safe_load(api_path.open(encoding="utf-8"))
+                            print("raw_api=", raw_api)
+                            # 一个step包含request,response,return等关键字
+                            step = rend_template_any(raw_api["api"], **self.context)
+                            res_param = self.run(step, request_session)
+                            self.context.update(res_param)
                         else:  # item = api
                             request_session = args.get('request_session')  # session 请求会话
                             # 通过调用from_config_and_env这个类方法将ip, port, urlprefix这三个参数传入，构造完整的url
                             # handler = self.handlers[item].from_config_and_env(config)
-                            print("request_session=", request_session)
+                            # print("request_session=", request_session)
+                            # 一个step包含request,response,return等关键字
                             step = rend_template_any(value, **self.context)
                             print("step:", step)
                             # res_param为response返回值

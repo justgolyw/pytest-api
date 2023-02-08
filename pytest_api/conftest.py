@@ -30,31 +30,6 @@ debug = False
 #     return host, port
 
 
-# @pytest.fixture(scope="session", autouse=True)
-# def login(request_session):
-#     """全局仅一次登录， 更新session请求头部"""
-#     # login_url = "https://10.113.75.133/v3-public/localproviders/local?action=login"
-#     login_url = "/v3-public/localproviders/local?action=login"
-#     json = {"username": "admin", "password": "Admin@123", "responseType": "cookie"}
-#     # response = requests.post(login_url, json=json, verify=False)
-#     response = request_session.send_request(method="post", url=login_url, json=json)
-#     cookie = get_cookie(response)
-#     headers = {"Cookie": cookie}
-#     request_session.headers.update(headers)
-
-
-@pytest.fixture(scope="session", autouse=True)
-def login(request_session):
-    """全局仅一次登录， 更新session请求头部"""
-    import uuid
-    token = str(uuid.uuid4())
-    headers = {
-        "Authentication": f"Bearer {token}"
-    }
-    request_session.headers.update(headers)
-    print("headers=", request_session.headers)
-
-
 @pytest.fixture(scope="session")
 def request_session(pytestconfig):
     """全局session"""
@@ -62,8 +37,9 @@ def request_session(pytestconfig):
     # 或者 pytestconfig获取配置参数
     # envs = get_envs(request.config)
     envs = get_envs(pytestconfig)
-    ip, port = envs["host"], envs["port"]
-    session = ApiRequest(ip, port)
+    host, port = envs["host"], envs["port"]
+    session = ApiRequest(host, port)
+    print("初始化session=", request_session)
     # max_retries=2 重试2次
     session.mount("http://", HTTPAdapter(max_retries=2))
     session.mount("https://", HTTPAdapter(max_retries=2))
@@ -99,6 +75,7 @@ def pytest_addoption(parser):
 def pytest_collect_file(file_path: Path, parent):  # noqa
     # if file_path.suffix == ".yml" and not is_ignore_file(file_path):
     if file_path.suffix == ".yml" and file_path.name.startswith("test"):
+        print("file_path=", file_path)
         py_module = Module.from_parent(parent, path=file_path)
         # 动态创建 module
         module = types.ModuleType(file_path.stem)

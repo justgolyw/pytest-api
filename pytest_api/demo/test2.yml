@@ -1,0 +1,18 @@
+name: 分层测试
+config:
+    variables:
+        username: "test123"
+        password: "123456"
+
+
+steps:
+-
+    name: get
+    step: api/login.yml
+    api:
+        name: get
+        request:
+            method: GET
+            url: /get
+        response:
+            - eq: [ status_code, 200]
