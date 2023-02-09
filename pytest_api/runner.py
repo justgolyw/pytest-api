@@ -110,7 +110,8 @@ class Runner(ApiRunner):
         case_name = self.raw.get('name', '')  # 测试用例名字
         steps = self.raw.get("steps", [])  # 获取测试步骤
         config = self.raw.get('config', {})  # 公共参数
-        config_variables = config.get('variables', {}) if config else {}
+        config_variables = config.get('variables', {}) if config else {}  # variables
+        config_fixtures = config.get("fixtures", [])  # fixtures
 
         # tags = self.raw["tags"] if "tags" in self.raw else []
         skip = self.raw.get("skip", "")
@@ -159,8 +160,13 @@ class Runner(ApiRunner):
             self.context.update(my_builtins.__dict__)  # 自定义函数加载
             self.module_variable = rend_template_any(config_variables, **self.context)
             self.context.update(self.module_variable)
+            config_fixtures = rend_template_any(config_fixtures, **self.context)
 
             def run_case(args):
+                request_session = args.get('request_function') or \
+                                  args.get('request_module') or \
+                                  args.get('request_session')
+
                 for step in steps:
                     # 支持跳过单个测试步骤
                     if "skip" in step and step["skip"]:
@@ -171,7 +177,7 @@ class Runner(ApiRunner):
                         elif item == "sleep":
                             time.sleep(value)
                         elif item == "step":
-                            request_session = args.get('request_session')
+                            # request_session = args.get('request_session')
                             # 内置request 获取root_dir
                             root_dir = pytestconfig.rootdir
                             print("root_dir=", root_dir)
@@ -184,7 +190,7 @@ class Runner(ApiRunner):
                             res_param = self.run(step, request_session)
                             self.context.update(res_param)
                         else:  # item = api
-                            request_session = args.get('request_session')  # session 请求会话
+                            # request_session = args.get('request_session')  # session 请求会话
                             # 通过调用from_config_and_env这个类方法将ip, port, urlprefix这三个参数传入，构造完整的url
                             # handler = self.handlers[item].from_config_and_env(config)
                             # print("request_session=", request_session)
@@ -199,11 +205,60 @@ class Runner(ApiRunner):
             f = create_function_from_parameters(
                 func=run_case,
                 # parameters 传内置fixture
-                parameters=[
-                    Parameter('request_session', Parameter.POSITIONAL_OR_KEYWORD),
-                ],
+                # parameters=[
+                #     Parameter('request_session', Parameter.POSITIONAL_OR_KEYWORD),
+                # ],
+                # parameters 传内置fixture 和 用例fixture
+                parameters=self.function_parameters(config_fixtures),
                 documentation=case_name,
                 func_name=str(self.module.__name__),
                 func_filename=f"{self.module.__name__}.py",
             )
             setattr(self.module, str(self.module.__name__), f)
+
+    @staticmethod
+    def function_parameters(config_fixtures):
+        """测试用例传fixture"""
+        # 内置request fixture
+        function_parameters = [
+            Parameter("request", Parameter.POSITIONAL_OR_KEYWORD),
+        ]
+
+        """
+        获取传递给用例的fixtures
+        格式1，字符串形式，逗号隔开
+        config:
+            fixtures: fixture_name1,  fixture_name2
+        格式2：列表形式
+        config:
+            fixtures: [fixture_name1,  fixture_name2]
+        """
+
+        # 获取传给用例的 fixtures
+        print("config_fixtures=", config_fixtures)
+        if isinstance(config_fixtures, str):
+            config_fixtures = [item.strip(" ") for item in config_fixtures.split(',')]
+        if not config_fixtures:
+            function_parameters.append(
+                Parameter('request_session', Parameter.POSITIONAL_OR_KEYWORD),
+            )
+        else:
+            if 'request_function' in config_fixtures:
+                function_parameters.append(
+                    Parameter('request_function', Parameter.POSITIONAL_OR_KEYWORD),
+                )
+            elif 'request_module' in config_fixtures:
+                function_parameters.append(
+                    Parameter('request_module', Parameter.POSITIONAL_OR_KEYWORD),
+                )
+            else:
+                function_parameters.append(
+                    Parameter('request_session', Parameter.POSITIONAL_OR_KEYWORD),
+                )
+            for fixture in config_fixtures:
+                if fixture not in ['request_function', 'request_module', "request_session"]:
+                    function_parameters.append(
+                        Parameter(fixture, Parameter.POSITIONAL_OR_KEYWORD),
+                    )
+        print("function_parameters=", function_parameters)
+        return function_parameters

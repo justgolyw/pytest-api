@@ -29,17 +29,98 @@ debug = False
 #     print(f"读取配置文件：host={host}, port={port}")
 #     return host, port
 
+# @pytest.fixture(scope="session")
+# def request_session(pytestconfig):
+#     """全局session 全部用例仅执行一次"""
+#     # 通过request.config 获取配置参数
+#     # 或者 pytestconfig获取配置参数
+#     # envs = get_envs(request.config)
+#     envs = get_envs(pytestconfig)
+#     host, port = envs["host"], envs["port"]
+#     session = ApiRequest(host, port)
+#     print("初始化全局session=", session)
+#     # max_retries=2 重试2次
+#     session.mount("http://", HTTPAdapter(max_retries=2))
+#     session.mount("https://", HTTPAdapter(max_retries=2))
+#     yield session
+#     session.close()
+#
+#
+# @pytest.fixture(scope="module")
+# def request_module(pytestconfig):
+#     """模块级别 session， 每个模块仅执行一次"""
+#     # 通过request.config 获取配置参数
+#     # 或者 pytestconfig获取配置参数
+#     # envs = get_envs(request.config)
+#     envs = get_envs(pytestconfig)
+#     host, port = envs["host"], envs["port"]
+#     session = ApiRequest(host, port)
+#     print("初始化模块session=", session)
+#     # max_retries=2 重试2次
+#     session.mount("http://", HTTPAdapter(max_retries=2))
+#     session.mount("https://", HTTPAdapter(max_retries=2))
+#     yield session
+#     session.close()
+#
+#
+# @pytest.fixture(scope="function")
+# def request_function(pytestconfig):
+#     """用例级别 session， 每个用例都会执行一次"""
+#     # 通过request.config 获取配置参数
+#     # 或者 pytestconfig获取配置参数
+#     # envs = get_envs(request.config)
+#     envs = get_envs(pytestconfig)
+#     host, port = envs["host"], envs["port"]
+#     session = ApiRequest(host, port)
+#     print("初始化用例session=", session)
+#     # max_retries=2 重试2次
+#     session.mount("http://", HTTPAdapter(max_retries=2))
+#     session.mount("https://", HTTPAdapter(max_retries=2))
+#     yield session
+#     session.close()
+
 
 @pytest.fixture(scope="session")
-def request_session(pytestconfig):
-    """全局session"""
+def request_session(request):
+    """全局session 全部用例仅执行一次"""
     # 通过request.config 获取配置参数
     # 或者 pytestconfig获取配置参数
-    # envs = get_envs(request.config)
-    envs = get_envs(pytestconfig)
+    envs = get_envs(request.config)
     host, port = envs["host"], envs["port"]
     session = ApiRequest(host, port)
-    print("初始化session=", request_session)
+    print("初始化全局session=", session)
+    # max_retries=2 重试2次
+    session.mount("http://", HTTPAdapter(max_retries=2))
+    session.mount("https://", HTTPAdapter(max_retries=2))
+    yield session
+    session.close()
+
+
+@pytest.fixture(scope="module")
+def request_module(request):
+    """模块级别 session， 每个模块仅执行一次"""
+    # 通过request.config 获取配置参数
+    # 或者 pytestconfig获取配置参数
+    envs = get_envs(request.config)
+    host, port = envs["host"], envs["port"]
+    session = ApiRequest(host, port)
+    print("初始化模块session=", session)
+    # max_retries=2 重试2次
+    session.mount("http://", HTTPAdapter(max_retries=2))
+    session.mount("https://", HTTPAdapter(max_retries=2))
+    yield session
+    session.close()
+
+
+@pytest.fixture(scope="function")
+def request_function(request):
+    """用例级别 session， 每个用例都会执行一次"""
+    # 通过request.config 获取配置参数
+    # 或者 pytestconfig获取配置参数
+    envs = get_envs(request.config)
+    host, port = envs["host"], envs["port"]
+    session = ApiRequest(host, port)
+    print("初始化用例session=", session)
     # max_retries=2 重试2次
     session.mount("http://", HTTPAdapter(max_retries=2))
     session.mount("https://", HTTPAdapter(max_retries=2))

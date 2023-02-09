@@ -13,13 +13,33 @@ import pytest
 #     request_session.headers.update(headers)
 
 
-@pytest.fixture(scope="session", autouse=False)
-def login(request_session):
-    """全局仅一次登录， 更新session请求头部"""
-    import uuid
-    token = str(uuid.uuid4())
-    headers = {
-        "Authentication": f"Bearer {token}"
-    }
-    request_session.headers.update(headers)
-    print("headers=", request_session.headers)
+# @pytest.fixture(scope="session", autouse=False)
+# def login(request_session):
+#     """全局仅一次登录， 更新session请求头部"""
+#     import uuid
+#     token = str(uuid.uuid4())
+#     headers = {
+#         "Authentication": f"Bearer {token}"
+#     }
+#     request_session.headers.update(headers)
+#     print("headers=", request_session.headers)
+
+@pytest.fixture(scope="function")
+def demo_fixture1():
+    print("用例前置操作->do something .....")
+    yield
+    print("用例后置操作，do something .....")
+
+
+@pytest.fixture(scope="module")
+def demo_fixture2():
+    print("用例前置操作->do something .....")
+    yield
+    print("用例后置操作，do something .....")
+
+
+@pytest.fixture(scope="session")
+def demo_fixture3():
+    print("用例前置操作->do something .....")
+    yield
+    print("用例后置操作，do something .....")

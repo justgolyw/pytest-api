@@ -1,4 +1,6 @@
 name: demo1
+config:
+  fixtures: demo_fixture2
 
 steps:
 -

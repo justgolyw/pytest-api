@@ -1,0 +1,35 @@
+name: finture测试
+
+config:
+  variables:
+    username: test
+    password: "123456"
+#  fixtures: demo_fixture2
+#  fixtures: request_module
+#  fixtures: request_function
+  fixtures: request_session
+
+
+steps:
+-
+  api:
+    name: post
+    request:
+      method: POST
+      url: /post
+      json:
+        # 支持切片取值
+        username: ${username[:4]}
+        password: ${password}
+    return:
+        url:  body.url
+    response:
+      - eq: [status_code, 200]
+#-
+#  api:
+#    name: get
+#    request:
+#      method: GET
+#      url: /get
+#    response:
+#      - eq: [status_code, 200]
