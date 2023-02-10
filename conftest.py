@@ -43,3 +43,7 @@ def demo_fixture3():
     print("用例前置操作->do something .....")
     yield
     print("用例后置操作，do something .....")
+
+
+# def demo_fixture4():
+#     print("用例前置操作->do something .....")

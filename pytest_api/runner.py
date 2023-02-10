@@ -112,6 +112,7 @@ class Runner(ApiRunner):
         config = self.raw.get('config', {})  # 公共参数
         config_variables = config.get('variables', {}) if config else {}  # variables
         config_fixtures = config.get("fixtures", [])  # fixtures
+        config_params = config.get('parameters', [])  # parameters
 
         # tags = self.raw["tags"] if "tags" in self.raw else []
         skip = self.raw.get("skip", "")
@@ -161,11 +162,17 @@ class Runner(ApiRunner):
             self.module_variable = rend_template_any(config_variables, **self.context)
             self.context.update(self.module_variable)
             config_fixtures = rend_template_any(config_fixtures, **self.context)
+            config_params = rend_template_any(config_params, **self.context)
+            print("config_params=", config_params)
 
             def run_case(args):
+                print("args=", args)
                 request_session = args.get('request_function') or \
                                   args.get('request_module') or \
                                   args.get('request_session')
+
+                # 加载参数化的值和fixture的值
+                self.context.update(args)
 
                 for step in steps:
                     # 支持跳过单个测试步骤
@@ -180,11 +187,11 @@ class Runner(ApiRunner):
                             # request_session = args.get('request_session')
                             # 内置request 获取root_dir
                             root_dir = pytestconfig.rootdir
-                            print("root_dir=", root_dir)
+                            # print("root_dir=", root_dir)
                             api_path = Path(root_dir).joinpath(value)
-                            print("api_path=", api_path)
+                            # print("api_path=", api_path)
                             raw_api = yaml.safe_load(api_path.open(encoding="utf-8"))
-                            print("raw_api=", raw_api)
+                            # print("raw_api=", raw_api)
                             # 一个step包含request,response,return等关键字
                             step = rend_template_any(raw_api["api"], **self.context)
                             res_param = self.run(step, request_session)
@@ -215,6 +222,9 @@ class Runner(ApiRunner):
                 func_filename=f"{self.module.__name__}.py",
             )
             setattr(self.module, str(self.module.__name__), f)
+            if config_params:
+                # 向 module 中加参数化数据的属性
+                setattr(self.module, 'params_data', config_params)
 
     @staticmethod
     def function_parameters(config_fixtures):
@@ -262,3 +272,13 @@ class Runner(ApiRunner):
                     )
         print("function_parameters=", function_parameters)
         return function_parameters
+
+    # @staticmethod
+    # def parameters_data(fixtures, parameters):
+    #     # 字符串切成list
+    #     if isinstance(fixtures, str):
+    #         fixtures = [item.strip("") for item in fixtures.split(",")]
+    #     if isinstance(parameters, str) and len(parameters) > 1:
+    #         return fixtures, parameters
+    #     else:
+    #         return fixtures, []

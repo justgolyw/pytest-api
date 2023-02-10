@@ -156,7 +156,7 @@ def pytest_addoption(parser):
 def pytest_collect_file(file_path: Path, parent):  # noqa
     # if file_path.suffix == ".yml" and not is_ignore_file(file_path):
     if file_path.suffix == ".yml" and file_path.name.startswith("test"):
-        print("file_path=", file_path)
+        # print("file_path=", file_path)
         py_module = Module.from_parent(parent, path=file_path)
         # 动态创建 module
         module = types.ModuleType(file_path.stem)
@@ -192,3 +192,25 @@ def pytest_runtest_makereport(item):
     report = outcome.get_result()
     getattr(report, 'extra', [])
     report.nodeid = report.nodeid.encode("unicode_escape").decode("utf-8")
+
+
+def pytest_generate_tests(metafunc):  # noqa
+    """测试用例参数化功能实现"""
+    if hasattr(metafunc.module, "params_data"):
+
+        params_data = getattr(metafunc.module, "params_data")
+        if isinstance(params_data[0], list):
+            # params_data 是list in list: [[a,1],[b, 2]]
+            params_len = len(params_data[0])  # 参数化参数的个数
+        else:
+            # params_data 是 list: [a, 1]
+            params_len = 1
+
+        params_args = metafunc.fixturenames[-params_len:]
+        print("params_args=", params_args)
+
+        metafunc.parametrize(
+            params_args,  # 参数化收集时的参数名称
+            params_data,  # 参数化收集时的测试数据
+            scope="function"  # 测试用例对象
+        )

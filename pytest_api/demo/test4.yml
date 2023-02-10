@@ -1,0 +1,29 @@
+name: parameters测试
+
+config:
+  fixtures: username, password
+  parameters:
+    - [test1, '123456']
+    - [test2, '654321']
+
+#  variables:
+#    username: "test123"
+#    password: "123456"
+
+
+
+steps:
+-
+  api:
+    name: post
+    request:
+      method: POST
+      url: /post
+      json:
+        # 支持切片取值
+        username: ${username}
+        password: ${password}
+    return:
+        url:  body.url
+    response:
+      - eq: [status_code, 200]
