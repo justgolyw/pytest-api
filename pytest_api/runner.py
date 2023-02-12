@@ -2,9 +2,9 @@ import time
 import types
 from inspect import Parameter
 from pathlib import Path
-
 import yaml
-
+import mimetypes
+from requests_toolbelt import MultipartEncoder
 from . import my_builtins, validate
 from .create_function import create_function_from_parameters
 from .render import rend_template_any
@@ -78,11 +78,51 @@ class ApiRunner:
                         # print(f'{check_type}  not valid check type')
                         raise Exception(f'{check_type}  not valid check type')
 
-    def run(self, step, session):
+    @staticmethod
+    def upload_file(filepath: Path):
+        """根据文件路径，自动获取文件名和文件mime类型"""
+        if not filepath.exists():
+            print(f"文件路径{filepath}不存在")
+            return
+        mime_type = mimetypes.guess_type(filepath)[0]
+        return (
+            filepath.name, filepath.open("rb"), mime_type
+        )
+
+    def multipart_encoder_request(self, request_value, root_dir):
+        """判断请求头部 Content-Type: multipart/form-data 格式支持"""
+        request_header = request_value.get("headers", {})
+        if "files" in request_value.keys():
+            fields = []
+            for key, value in request_value.get("files", {}).items:
+                if Path(root_dir).joinpath(value).is_file():
+                    fields.append(
+                        # resolve 获取绝对路径
+                        (key, self.upload_file(Path(root_dir).joinpath(value).resolve()))
+                    )
+                else:
+                    fields.append({key: value})
+            print("fields=", fields)
+            m = MultipartEncoder(fields=fields)
+            request_value.pop("files")  # 去掉files参数
+            request_value["data"] = m
+            # 添加上传文件时的请求头
+            request_header.update({'Content-Type': m.content_type})
+            print("request_headers=", request_header)
+        return request_value, request_header
+
+    def run(self, step, session, args=None):
         res_param = {}
         # 发送请求
         assert "request" in step, "步骤中必须要有request字段，请检查当前yml文件"
-        r = self._run(step["request"], session)
+        # 获取请求体
+        request_value = step["request"]
+        # multipart/form-data 文件上传支持
+        root_dir = args.get('request').config.rootdir  # 内置request 获取root_dir
+        request_value, request_header = self.multipart_encoder_request(request_value, root_dir)
+        if request_header:
+            session.headers.update(request_header)
+        r = self._run(request_value, session)
         # 请求对比
         if "response" in step:
             self.validate_response(r, step["response"])
@@ -194,7 +234,7 @@ class Runner(ApiRunner):
                             # print("raw_api=", raw_api)
                             # 一个step包含request,response,return等关键字
                             step = rend_template_any(raw_api["api"], **self.context)
-                            res_param = self.run(step, request_session)
+                            res_param = self.run(step, request_session, args)
                             self.context.update(res_param)
                         else:  # item = api
                             # request_session = args.get('request_session')  # session 请求会话
@@ -206,7 +246,7 @@ class Runner(ApiRunner):
                             print("step:", step)
                             # res_param为response返回值
                             # res_param = ApiRunner().run(step, request_session)
-                            res_param = self.run(step, request_session)
+                            res_param = self.run(step, request_session, args)
                             self.context.update(res_param)
 
             f = create_function_from_parameters(

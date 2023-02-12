@@ -25,3 +25,4 @@ Requirements
 * 使用jinja2进行模板渲染，支持在yml中使用自定义函数
 * 支持全局，模块，用例级别的session，支持自定义fixture
 * 支持测试用例参数化实现
+* 支持文件上传功能

@@ -1,0 +1,11 @@
+name: 文件上传测试
+
+steps:
+-
+  api:
+    request:
+      method: POST
+      url: api/v1/upfile/
+      files:
+          title: 文件上传
+          file: data/abc.jpg

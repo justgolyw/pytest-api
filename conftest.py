@@ -50,7 +50,7 @@ def demo_fixture3():
 #     print("用例前置操作->do something .....")
 
 
-def pytest_generate_tests(metafunc):
+# def pytest_generate_tests(metafunc):
     """ generate (multiple) parametrized calls to a test function."""
     params_args = ["username", "password"]
     # if "param" in metafunc.fixturenames:
@@ -62,12 +62,12 @@ def pytest_generate_tests(metafunc):
     #         scope="function"              # 测试用例对象
     #     )
 
-    print(metafunc.fixturenames)
-    params_args = metafunc.fixturenames[1:3]
-    print(params_args)
-    metafunc.parametrize(
-        params_args,  # 参数名称
-        metafunc.module.test_data,  # 测试数据
-        # ids=metafunc.module.names,  # 用例名称
-        scope="function"  # 测试用例对象
-    )
+    # print(metafunc.fixturenames)
+    # params_args = metafunc.fixturenames[1:3]
+    # print(params_args)
+    # metafunc.parametrize(
+    #     params_args,  # 参数名称
+    #     metafunc.module.test_data,  # 测试数据
+    #     # ids=metafunc.module.names,  # 用例名称
+    #     scope="function"  # 测试用例对象
+    # )
