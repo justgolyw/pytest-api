@@ -1,0 +1,11 @@
+steps:
+  -
+     name: 环境变量参数化读取
+     exec:
+       # 1.不填写ssh_client字段，则默认使用env.yml文件中的ssh_client信息
+       # 2.可以自己指定ssh_client 信息
+       # 3.可以使用内置的read_file(path) 从env.yml中读取参数化信息
+       # ssh_client: [10.74.60.2, 22, root, Sangfor-paas.237]
+       # k8s_agent: True
+       ssh_client: ${read_file('env.yml')['ssh_client']}
+       shell: kubectl get project -A

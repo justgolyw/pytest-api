@@ -1,0 +1,20 @@
+name: 参数值提取与校验
+config:
+  variables:
+    clusterId: c-cxth7
+    pro_name: ${random_str()}
+steps:
+  -
+    name: 创建项目
+    request:
+      url: /v3/project
+      method: POST
+      json:
+        clusterId: ${clusterId}
+        name: ${pro_name}
+    validate:
+      - eq: [status_code, 201]
+      - eq: [headers."Content-Type", application/json]
+      - eq: [response.name, '${pro_name}']
+      - eq: [$..name, '${pro_name}']
+      - eq: ['"name":*"(.+?)"', '${pro_name}']

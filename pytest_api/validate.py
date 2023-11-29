@@ -56,7 +56,7 @@ def length_less_than_or_equals(check_value, expect_value):
 
 def contains(check_value, expect_value):
     assert isinstance(check_value, (list, tuple, dict, str))
-    assert expect_value in check_value, f'{len(expect_value)} in {check_value})'
+    assert expect_value in check_value
 
 
 def contained_by(check_value, expect_value):

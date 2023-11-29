@@ -1,0 +1,33 @@
+name: 参数提取
+config:
+  variables:
+    clusterId: c-cxth7
+    name: ${random_str()}
+steps:
+  -
+    name: 创建项目
+    request:
+      url: /v3/project
+      method: POST
+      json:
+        clusterId: ${clusterId}
+        name: ${name}
+    validate:
+      - eq: [ status_code, 201 ]
+    extract:
+      # jsonpath 提取变量
+       proj_id: $.id
+      # jmespath 提取变量
+      # proj_id: response.id
+  -
+    name: 创建namespace
+    request:
+      url: /v3/clusters/${clusterId}/namespace
+      method: POST
+      json:
+        clusterId: ${clusterId}
+        projectId: ${proj_id}
+        name: ${name}
+    validate:
+      - eq: [status_code, 201]
+      - eq: [$.name, '${name}']

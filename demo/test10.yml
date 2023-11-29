@@ -1,0 +1,23 @@
+name: python 默认内置函数的使用
+tags: ["Level1"]
+config:
+  variables:
+    var1: abc:123
+
+steps:
+  -
+    name: 执行print函数
+    print: hello world
+  -
+    # python字符串切片
+    print: ${var1[:3]}
+
+  -
+    # 字符串分割
+    print: ${split_str(var1, ':')}
+
+  - # 字符串分割以及切片
+    print: ${split_str(var1, ':')[1]}
+
+
+

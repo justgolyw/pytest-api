@@ -1,0 +1,33 @@
+name: 一个yaml文件中写多个用例
+tags: ["Level1"]
+steps:
+  -
+    name: 添加user1
+    request:
+      url: /v3/user
+      method: POST
+      json:
+        username: ${username()}
+        password: ${password()}
+    validate:
+      - eq: [status_code, 201]
+  -
+    name: 添加user2
+    request:
+      url: /v3/user
+      method: POST
+      json:
+        username: ${username()}
+        password: ${password()}
+    validate:
+      - ne: [status_code, 200]
+
+  -
+    exec:
+        ssh_client: [ 10.74.54.4, 22, root, Sangfor-paas.237 ]
+        k8s_agent: True
+        shell: kubectl get ns -A
+    validate2:
+      # * 表示全部
+      - eq: [ "*", default ]
+

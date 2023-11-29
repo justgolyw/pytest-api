@@ -1,0 +1,13 @@
+name: 登录
+tags: ["BVT"]
+steps:
+  -
+    request:
+      url: /v3-public/localProviders/local?action=login
+      method: POST
+      json:
+        username: admin
+        password: Admin@123
+        responseType: cookie
+    validate:
+      - eq: [status_code, 200]

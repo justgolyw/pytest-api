@@ -176,7 +176,7 @@ def pytest_configure(config):
 
 
 @pytest.hookimpl
-def pytest_terminal_summary(terminalreporter, exitstatus, config):  # noqa
+def pytest_terminal_summary(terminalreporter, exitstatus, config): # noqa
     """
     收集测试结果
     """
@@ -186,12 +186,12 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):  # noqa
         failed = len([i for i in terminalreporter.stats.get("failed", []) if i.when != "teardown"])
         error = len([i for i in terminalreporter.stats.get("error", []) if i.when != "teardown"])
         skipped = len([i for i in terminalreporter.stats.get("skipped", []) if i.when != "teardown"])
-        if terminalreporter._numcollected - skipped == 0:  # noqa
+        if terminalreporter._numcollected - skipped == 0: # noqa
             successful = 0
         else:
-            successful = len(terminalreporter.stats.get("passed", [])) / terminalreporter._numcollected * 100  # noqa
+            successful = len(terminalreporter.stats.get("passed", [])) / terminalreporter._numcollected * 100 # noqa
         # 执行时间
-        duration = time.time() - terminalreporter._sessionstarttime  # noqa
+        duration = time.time() - terminalreporter._sessionstarttime # noqa
         report_path = Path(config.rootpath).joinpath('reports', 'result.txt')
         # 如果文件夹不存在，则创建文件夹
         if not report_path.parent.exists():

@@ -1,0 +1,17 @@
+name: 自定义函数的使用
+config:
+  variables:
+    username: ${username()}
+    password: Admin@123
+steps:
+  -
+    name: 添加user
+    request:
+      url: /v3/users
+      method: POST
+      json:
+        username: ${username}
+        password: ${password}
+        name: ${username}
+    validate:
+      - eq: [status_code, 201]

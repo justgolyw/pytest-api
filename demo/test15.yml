@@ -1,0 +1,20 @@
+name: int 与 str 之间的相互转换
+config:
+  variables:
+    username: 123
+    password: "456"
+steps:
+  -
+    name: 添加user1
+    request:
+      url: /v3/user
+      method: POST
+      json:
+        # 在 yaml 文件中定义变量的时候，如果是纯数字的值，默认是数字类型，加上引号可以变成字符串类型，
+        # 不进行转换则读取的username为int类型，读取的password为str类型
+        # int转str, 或者 username: ${username | string}
+        username: ${str(username)}
+        # str转int
+        password: ${int(password)}
+    validate:
+      - eq: [status_code, 201

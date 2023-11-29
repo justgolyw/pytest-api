@@ -1,0 +1,19 @@
+name: 上传文件
+
+steps:
+  -
+    name: 上传文件
+    request:
+      url: /v3/cluster/c-lzg56/thingsmodes/tm-fdkv4?action=uploadPropertiesFile
+      method: POST
+      files:
+        file: 104_property.xlsx
+    validate:
+      - eq: [status_code, 200]
+
+  - name: 确认上传
+    request:
+      url: /v3/cluster/c-lzg56/thingsmodes/tm-fdkv4?action=commitUploadProperties
+      method: POST
+    validate:
+      - eq: [ status_code, 200 ]

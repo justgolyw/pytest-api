@@ -1,0 +1,11 @@
+name: 自定义fixture的使用
+config:
+  fixtures: demo_fixture
+steps:
+  -
+    name: 获取user
+    request:
+      url: /v3/users
+      method: GET
+    validate:
+      - eq: [status_code, 200]

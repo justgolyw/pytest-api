@@ -1,0 +1,12 @@
+requests==2.22.0
+pytest==7.2.1
+Jinja2==3.0.3
+jmespath==0.10.0
+jsonpath=0.82
+jsonpath-python==1.0.6
+paramiko==3.3.1
+scp==0.14.5
+codegen==1.0
+pyyaml==6.0
+requests_toolbelt==1.0.0
+allure-pytest==2.13.2

@@ -1,0 +1,31 @@
+name: 支持步骤中添加局部变量
+config:
+  variables:
+#    username: test1
+    password: Admin@123
+steps:
+  -
+    name: 添加user1
+    variables:
+      username: test2
+    request:
+      url: /v3/user
+      method: POST
+      json:
+        username: ${username}
+        password: ${password}
+    validate:
+      - eq: [status_code, 201]
+  -
+    name: 添加user2
+    variables:
+      username: test3
+    request:
+      url: /v3/user
+      method: POST
+      json:
+        username: ${username}
+        password: ${password}
+    validate:
+      - eq: [status_code, 201]
+

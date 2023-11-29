@@ -1,0 +1,82 @@
+name: 参数化
+config:
+# 单参数单值
+#  fixtures: value
+#  parameters: ["test1"]
+
+# 单参数多值
+#  fixtures: value1
+#  parameters:
+#  - ["test1"]
+#  - ["test2"]
+
+
+# 多参数单值
+#  fixtures: value1, value2
+#  parameters: ["test1", "test2"]
+
+#   多参数多值
+#  fixtures: value1, value2
+#  parameters:
+#    - ["test1", "test2"]
+#    - ["test3", "test4"]
+
+# 单fixture单值
+#  fixtures: demo_fixture0
+#  parameters: ["test1"]
+#  indirect: True
+
+# 单fixture多值
+#  fixtures: demo_fixture0
+#  parameters:
+#    - ["test1"]
+#    - ["test2"]
+#  indirect: True
+
+# 多fixture单值
+#  fixtures: demo_fixture0, demo_fixture1
+#  parameters: ["test1", "test2"]
+#  indirect: True
+
+# 多fixture多值
+#  fixtures: demo_fixture0, demo_fixture1
+#  parameters:
+#    - ["test1", "test2"]
+#    - ["test3", "test4"]
+#  indirect: True
+
+# 多fixture多值
+#  fixtures: demo_fixture0, demo_fixture1
+#  parameters:
+#    - ["test1", "test2"]
+#    - ["test3", "test4"]
+#  indirect: True
+
+#  普通fixture和参数化fixture同时存在
+#  fixtures: demo_fixture_a, demo_fixture0, demo_fixture1
+#  parameters: ["test1", "test2"]
+#  indirect: True
+
+#  普通fixture和普通参数化同时存在
+#  fixtures: demo_fixture_a, value1
+#  parameters: [["test1"], ["test2"]]
+
+#  普通fixture和普通参数化同时存在, 要求将普通fixture写在前面
+#  fixtures: demo_fixture_a, value1
+#  parameters: [["test1"], ["test2"]]
+
+#  fixtures:  value1
+#  parameters: [["test1"], ["test2"]]
+
+
+steps:
+  -
+    name: 测试case
+    # 多fixture多值
+    fixtures: value2
+    parameters: [["test3"], ["test4"]]
+    indirect: True
+    print: hello, 测试1
+
+
+

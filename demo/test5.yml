@@ -1,0 +1,12 @@
+name: 多个自定义fixture的使用
+config:
+  fixtures: fixture1, fixture2     # 使用逗号隔开
+# fixtures: [fixture1, fixture2]   # 使用列表形式
+steps:
+  -
+    name: 获取user
+    request:
+      url: /v3/users
+      method: GET
+    validate:
+      - eq: [status_code, 200]

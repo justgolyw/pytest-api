@@ -1,0 +1,20 @@
+name: 用例分层：api引用
+config:
+  variables:
+    clusterId: c-cxth7
+steps:
+  -
+    name: 创建namespace
+    # 引用创建project的API
+    api: apis/proj.yml
+    extract:
+      proj_id: response.id
+    request:
+      url: /v3/clusters/${clusterId}/namespace
+      method: POST
+      json:
+        clusterId: ${clusterId}
+        projectId: ${proj_id}
+        name: ${random_str()}
+    validate:
+      - eq: [status_code, 201]

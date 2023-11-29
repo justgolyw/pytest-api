@@ -1,0 +1,40 @@
+name: shell检查请求示例
+config:
+  variables:
+    name: ${random_str()}
+    ns_id: default
+steps:
+  -
+    name: 创建configmap
+    request:
+      url: /api/v1/namespaces/${ns_id}/configmaps
+      method: post
+      json:
+        metadata:
+          name: ${name}
+        data:
+          lyw: test-lyw
+    validate:
+      - eq: [ status_code, 201]
+    extract:
+      cm_name: $.metadata.name
+  -
+     name: 执行shell检查
+     exec:
+       ssh_client: [10.113.65.49, 22, root, Sangfor-paas.237]
+       k8s_agent: True
+#       shell: kubectl get cm -n default ${cm_name} -o jsonpath='{.data}'
+       shell: kubectl get cm -n default | awk 'NR>1{print $1}'
+#       shell: kubectl get cm -n default
+     validate2:
+#       - eq: [$.lyw, test-lyw]
+       - contains: ["*", '${cm_name}']
+
+
+
+
+
+
+
+
+

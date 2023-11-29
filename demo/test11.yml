@@ -1,0 +1,31 @@
+config:
+  variables:
+    proj_name: ${random_str()}
+steps:
+  -
+    name: 创建项目
+    request:
+      url: /v3/project
+      method: POST
+      json:
+        clusterId: c-4lvc7
+        name: ${proj_name}
+    validate:
+      # 在validate中使用变量时需要加引号
+      - eq: [status_code, 201]
+      - eq: [$.name, '${proj_name}']
+    extract:
+      proj_id: $.id
+  -
+     name: 执行shell
+     exec:
+#       ssh_client: [10.74.60.2, 22, root, Sangfor-paas.237]
+#      k8s_agent: True
+       shell: kubectl get project -A
+     validate2:
+       # 在validate中使用变量时需要加引号
+       - eq: ['${split_str(proj_id, ":")[1]}', '${name}']
+#      - eq:
+#        # 字符串分割和切片
+#        - ${split_str(proj_id, ':')[1]}
+#        - True

@@ -1,0 +1,16 @@
+name: 变量的定义与引用
+config:
+  variables:
+    username: test1
+    password: Admin@123
+steps:
+  -
+    name: 添加user1
+    request:
+      url: /v3/user
+      method: POST
+      json:
+        username: ${username}
+        password: ${password}
+    validate:
+      - eq: [status_code, 201]

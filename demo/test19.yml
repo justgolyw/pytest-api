@@ -1,0 +1,38 @@
+name: 资源清理
+config:
+  fixtures: remove
+steps:
+  -
+    name: 添加user1
+    variables:
+      username: ${username()}
+      password: Admin@123
+    request:
+      url: /v3/users
+      method: POST
+      json:
+        username: ${username}
+        password: ${password}
+        name: ${username}
+    validate:
+      - eq: [status_code, 201]
+    extract:
+      url_1: $.links.self
+#    remove: ${url_1}
+
+  - name: 添加user2
+    variables:
+      username: ${username()}
+      password: Admin@123
+    request:
+      url: /v3/users
+      method: POST
+      json:
+        username: ${username}
+        password: ${password}
+        name: ${username}
+    validate:
+      - eq: [ status_code, 201 ]
+    extract:
+      url_2: $.links.self
+    remove: ${url_1}, ${url_2}

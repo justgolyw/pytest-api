@@ -1,0 +1,22 @@
+name: 测试用例参数化实现
+config:
+  # 方式1
+  parameters:
+    - { "username": "test1", "password": "Test1@123" }
+    - { "username": "test2", "password": "Test2@123" }
+# 方式2
+#  fixtures: username, password
+#  parameters:
+#    - [test1, 'Test1@123']
+#    - [test2, 'Test2@123']
+steps:
+  -
+    name: 添加user
+    request:
+      url: /v3/user
+      method: POST
+      json:
+         username: ${username}
+         password: ${password}
+    validate:
+      - eq: [status_code, 201]

@@ -1,0 +1,14 @@
+name: 自定义fixture结合request参数化的使用
+config:
+  fixtures: demo_fixture
+  parameters: ["test-abc"]
+  # indirect=True,传入fixture函数名称，不再是一个普通参数，而是要被调用的fixture函数
+  indirect: True
+steps:
+  -
+    name: 获取user
+    request:
+      url: /v3/users
+      method: GET
+    validate:
+      - eq: [status_code, 200]
